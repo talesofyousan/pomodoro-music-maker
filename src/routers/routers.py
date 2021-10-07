@@ -3,7 +3,7 @@ from logging import getLogger
 from typing import Any, Dict, List
 
 from fastapi import APIRouter
-from src.optimizer import Recommender, SampleData
+from src.recommender import get_recommended_music_index, SampleData
 
 logger = getLogger(__name__)
 router = APIRouter()
@@ -29,7 +29,7 @@ def metadata() -> Dict[str, Any]:
 @router.get("/recommend/test")
 def recommend_test() -> Dict[str, List[float]]:
     job_id = str(uuid.uuid4())
-    recommendation = Recommender().get_recommended_music_index(SampleData().list_music_time)
+    recommendation = get_recommender_music_index(SampleData().list_music_time)
     logger.info(f'test {job_id}: {recommendation}')
     return {"prediction":recommendation}
 
@@ -37,7 +37,7 @@ def recommend_test() -> Dict[str, List[float]]:
 @router.post("/recommend")
 def recommend(data: SampleData) -> Dict[str, List[List[int]]]:
     job_id = str(uuid.uuid4())
-    recommendation = Recommender().get_recommended_music_index(data.list_music_time)
+    recommendation = get_recommended_music_index(data.list_music_time)
     logger.info(f"{job_id}: {recommendation}")
     return {"recommend": recommendation}
 

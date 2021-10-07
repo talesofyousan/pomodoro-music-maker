@@ -9,15 +9,17 @@ class SampleData(BaseModel):
     list_music_time : List[int] = [257, 229, 266, 226, 278, 220, 273, 271, 206, 284, 187, 194, 201, 186, 278, 274, 195, 288, 181, 230]  
 
 class Recommender():
-    def __init__(self):
-        self.work_time_minute: int = 25
-        self.break_time_minute: int = 5
-        self.random_selection_ratio: float = 0.5
+    def __init__(self, work_time_minute, break_time_minute, random_selection_ratio, maximum_cycle, random_seed=None):
+        self.work_time_minute: int = work_time_minute
+        self.break_time_minute: int = break_time_minute
+        self.random_selection_ratio: float = random_selection_ratio
+        self.maximum_cycle :int = maximum_cycle
+        self.rs = np.random.RandomState(random_seed)
 
     def get_optimized_result(self, list_music_time, is_random=True):
         if is_random:
             idx_music_time = list(range(len(list_music_time)))
-            np.random.shuffle(idx_music_time)
+            self.rs.shuffle(idx_music_time)
             R = 0
             random_selected_index = []
             for idx in idx_music_time:
@@ -54,7 +56,9 @@ class Recommender():
         return random_selected_index + selected_index
 
     def get_recommended_music_index(self, list_music_time):
+
         num_cycle = int(sum(list_music_time) / (self.work_time_minute*60))
+        num_cycle = min(num_cycle, self.maximum_cycle)
         list_music_index = list(range(len(list_music_time)))
 
         list_selected_index = []
@@ -70,3 +74,21 @@ class Recommender():
             tmp_list_music_index = [idx for i, idx in enumerate(tmp_list_music_index) if not i in tmp]
 
         return list_selected_index
+
+def get_recommended_music_index(list_music_time):
+
+    work_time_minute = 25
+    break_time_minute = 5
+    random_selection_ratio = 0.5
+    maximum_cycle = 10
+
+    if len(list_music_time)==0 or sum(list_music_time) < work_time_minute * 60:
+        return []
+
+    recommendation = Recommender( \
+        work_time_minute = work_time_minute,  
+        break_time_minute = break_time_minute, 
+        random_selection_ratio = random_selection_ratio,
+        maximum_cycle = maximum_cycle).get_recommended_music_index(list_music_time)
+
+    return recommendation
