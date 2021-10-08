@@ -9,6 +9,7 @@ RUN apt-get -y update && \
     rm -rf /var/lib/apt/lists/* && \
     pip install --no-cache-dir -r requirements.txt
 
+COPY ./test/ /${PROJECT_DIR}/test/
 COPY ./src/ /${PROJECT_DIR}/src/
 
 ENV LOG_LEVEL DEBUG

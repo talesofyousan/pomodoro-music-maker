@@ -20,13 +20,10 @@ class Recommender():
         if is_random:
             idx_music_time = list(range(len(list_music_time)))
             self.rs.shuffle(idx_music_time)
-            R = 0
-            random_selected_index = []
-            for idx in idx_music_time:
-                R += list_music_time[idx]
-                random_selected_index.append(idx)
-                if self.work_time_minute * 60 * self.random_selection_ratio <= R:
-                    break
+            list_cursum = np.cumsum([list_music_time[i] for i in idx_music_time])
+            target_index = np.where(list_cursum <= self.work_time_minute * 60 * self.random_selection_ratio)[0].max()
+            random_selected_index = idx_music_time[:target_index + 1]
+            R = list_cursum[target_index]
         else:
             R = 0
             random_selected_index = []
@@ -42,7 +39,7 @@ class Recommender():
         # Objective
         problem += abs_sum_var
         # subject to
-        problem += sum_var == pp.lpSum([list_music_time[idx] * vec_x[idx] for idx in candidate_index] + [R , -25 * 60])
+        problem += sum_var == pp.lpSum([list_music_time[idx] * vec_x[idx] for idx in candidate_index] + [R , -self.work_time_minute * 60])
         problem += abs_sum_var >= sum_var
         problem += abs_sum_var >= -sum_var
         problem += pp.lpSum([vec_x[idx] for idx in candidate_index]) >= 1

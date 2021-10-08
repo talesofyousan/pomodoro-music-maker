@@ -68,3 +68,15 @@ push_all: push
 .PHONY: show_error
 show_error:
 	docker exec $(WEB_SINGLE_PATTERN) cat /var/log/gunicorn_error.log
+
+.PHONY: run_unittest
+run_unittest:
+	docker build \
+		-t $(DOCKER_REPOSITORY):$(WEB_SINGLE_PATTERN)_$(IMAGE_VERSION) \
+		-f $(DOCKERFILE) \
+		.
+	docker run \
+		--rm \
+		--name unittest \
+		$(DOCKER_REPOSITORY):$(WEB_SINGLE_PATTERN)_$(IMAGE_VERSION) \
+		python -m unittest discover test/
