@@ -79,4 +79,17 @@ run_unittest:
 		--rm \
 		--name unittest \
 		$(DOCKER_REPOSITORY):$(WEB_SINGLE_PATTERN)_$(IMAGE_VERSION) \
-		python -m unittest discover test/
+		python -m unittest discover tests/
+
+.PHONY: run_ct
+run_ct:
+	docker build \
+		-t $(DOCKER_REPOSITORY):$(WEB_SINGLE_PATTERN)_$(IMAGE_VERSION) \
+		-f $(DOCKERFILE) \
+		.
+	docker run \
+		--rm \
+		--name $(WEB_SINGLE_PATTERN) \
+		-p $(WEB_SINGLE_PATTERN_PORT):$(WEB_SINGLE_PATTERN_PORT) \
+		$(DOCKER_REPOSITORY):$(WEB_SINGLE_PATTERN)_$(IMAGE_VERSION) \
+		pytest -rfs

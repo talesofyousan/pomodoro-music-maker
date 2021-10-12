@@ -29,9 +29,9 @@ def metadata() -> Dict[str, Any]:
 @router.get("/recommend/test")
 def recommend_test() -> Dict[str, List[float]]:
     job_id = str(uuid.uuid4())
-    recommendation = get_recommender_music_index(SampleData().list_music_time)
+    recommendation = get_recommended_music_index(SampleData().list_music_time)
     logger.info(f'test {job_id}: {recommendation}')
-    return {"prediction":recommendation}
+    return {"recommend":recommendation}
 
 
 @router.post("/recommend")
