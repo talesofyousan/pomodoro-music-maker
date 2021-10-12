@@ -5,8 +5,10 @@ import itertools
 from pydantic import BaseModel
 from typing import List
 
+from src.preprocessor import InputPreprocessor
+
 class SampleData(BaseModel):
-    list_music_time : List[int] = [257, 229, 266, 226, 278, 220, 273, 271, 206, 284, 187, 194, 201, 186, 278, 274, 195, 288, 181, 230]  
+    list_music_time : List[int] = [100, 110, 120, 130, 0, 140, 160, 170, 180, 190, 200, 101]
 
 class Recommender():
     def __init__(self, work_time_minute, break_time_minute, random_selection_ratio, maximum_cycle, random_seed=None):
@@ -81,6 +83,9 @@ def get_recommended_music_index(list_music_time):
 
     if len(list_music_time)==0 or sum(list_music_time) < work_time_minute * 60:
         return []
+
+    preprocessor = InputPreprocessor(work_time_minute)
+    list_music_time = preprocessor.preprocess_input(list_music_time)
 
     recommendation = Recommender( \
         work_time_minute = work_time_minute,  
